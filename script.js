@@ -36,6 +36,13 @@ navLinks.forEach(link => {
                  renderShoppingList(initialShoppingList);
                  // TODO: AIおすすめアイテムの表示処理を追加
             }
+            // 家族ルールセクションが表示されたらリストを読み込み・表示
+            else if (targetSectionId === 'family-rules') {
+                 const initialRules = loadRules();
+                 renderRules(initialRules);
+                 // フォームエリアを非表示に戻す
+                 hideRuleForm();
+            }
             // TODO: 他のセクション表示時の初期化処理を追加
         }
     });
@@ -592,6 +599,258 @@ newShoppingItemInput.addEventListener('keypress', function(event) {
 // window.addEventListener('load', function() { ... }); // この処理はセクション切り替えロジックに移しました
 
 
+// --- Family Rules Management with Local Storage ---
+
+const ruleList = document.getElementById('rule-list');
+const ruleFormArea = document.getElementById('rule-form-area');
+const ruleFormTitle = document.getElementById('rule-form-title');
+const ruleForm = document.getElementById('rule-form');
+const ruleIdInput = document.getElementById('rule-id');
+const ruleContentInput = document.getElementById('rule-content');
+const ruleResponsibleMembersInput = document.getElementById('rule-responsible-members');
+const ruleRewardInput = document.getElementById('rule-reward');
+const showAddRuleFormButton = document.getElementById('show-add-rule-form');
+const cancelRuleFormButton = document.getElementById('cancel-rule-form');
+// TODO: 編集モード時の削除ボタンも必要
+
+
+let editingRuleId = null; // 編集中かどうか、および編集中のルールのIDを保持する変数
+
+
+// Function to create a rule item HTML element
+function createRuleItemElement(rule) {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('rule-item');
+    // データ属性としてルールIDを保持させる
+    itemDiv.dataset.ruleId = rule.id;
+
+    // 今日の日付を取得 (YYYY-MM-DD形式)
+    const today = new Date().toISOString().slice(0, 10);
+    // 今日のスタンプ状態を取得
+    const isStampedToday = rule.stamps && rule.stamps[today] === true;
+
+    itemDiv.innerHTML = `
+        <button class="stamp-button ${isStampedToday ? 'stamped' : ''}" data-rule-id="${rule.id}">🌟</button>
+        <div class="rule-content">
+            ${rule.content}
+            ${rule.responsibleMembers ? `<span class="text-sm text-gray-500 ml-2">(${rule.responsibleMembers})</span>` : ''}
+            ${rule.reward ? `<span class="text-sm text-purple-500 ml-2">✨ ${rule.reward}</span>` : ''}
+        </div>
+        <div class="rule-actions">
+             <button class="edit-rule-btn">編集</button>
+             <button class="delete-rule-btn">削除</button>
+        </div>
+    `;
+
+    // スタンプボタンにイベントリスナーを追加
+    itemDiv.querySelector('.stamp-button').addEventListener('click', function() {
+        const ruleId = parseInt(this.dataset.ruleId); // ボタン自身のデータ属性からIDを取得
+        toggleRuleStamp(ruleId);
+    });
+
+    // 削除ボタンにイベントリスナーを追加
+    itemDiv.querySelector('.delete-rule-btn').addEventListener('click', function() {
+        const ruleId = parseInt(this.closest('.rule-item').dataset.ruleId);
+        deleteRule(ruleId);
+    });
+
+    // 編集ボタンにイベントリスナーを追加
+    itemDiv.querySelector('.edit-rule-btn').addEventListener('click', function() {
+        const ruleId = parseInt(this.closest('.rule-item').dataset.ruleId);
+        startEditingRule(ruleId);
+    });
+
+
+    return itemDiv;
+}
+
+// Function to render rules from an array
+function renderRules(rules) {
+    ruleList.innerHTML = ''; // Clear current list
+    // TODO: ソート順を検討
+    rules.forEach(rule => {
+        const itemElement = createRuleItemElement(rule);
+        ruleList.appendChild(itemElement);
+    });
+}
+
+// Function to save rules to Local Storage
+function saveRules(rules) {
+    localStorage.setItem('familyLifePlannerRules', JSON.stringify(rules));
+}
+
+// Function to load rules from Local Storage
+function loadRules() {
+    const rulesJson = localStorage.getItem('familyLifePlannerRules');
+    if (rulesJson) {
+        return JSON.parse(rulesJson);
+    }
+    return []; // データがない場合は空の配列を返す
+}
+
+// Function to show the rule form for adding
+function showAddRuleForm() {
+    ruleFormArea.classList.add('active');
+    ruleFormTitle.textContent = '新しいルールを追加';
+    ruleForm.reset(); // フォームをクリア
+    ruleIdInput.value = ''; // 隠しフィールドもクリア
+    editingRuleId = null; // 編集中IDをリセット
+    // TODO: 編集モード時のUI調整（削除ボタン非表示など）
+}
+
+// Function to hide the rule form
+function hideRuleForm() {
+    ruleFormArea.classList.remove('active');
+    cancelEditingRule(); // 編集モードを終了
+}
+
+
+// Function to add a new rule
+function addRule(content, responsibleMembers, reward) {
+    const rules = loadRules();
+    const newRule = {
+        id: Date.now(), // 簡単なユニークID
+        content: content,
+        responsibleMembers: responsibleMembers,
+        reward: reward,
+        stamps: {} // スタンプ情報を保持するオブジェクト
+    };
+    rules.push(newRule);
+    saveRules(rules);
+    renderRules(rules);
+
+    alert('新しいルールを追加しました！');
+    hideRuleForm(); // フォームを閉じる
+}
+
+// Function to delete a rule
+function deleteRule(id) {
+     if (confirm('このルールを削除しますか？')) { // 削除確認
+        let rules = loadRules();
+        rules = rules.filter(rule => rule.id !== id);
+        saveRules(rules);
+        renderRules(rules);
+        alert('ルールを削除しました。');
+        // 削除したルールが編集中のものだった場合、編集モードを終了
+        if (editingRuleId === id) {
+            cancelEditingRule();
+        }
+     }
+}
+
+// Function to start editing a rule
+function startEditingRule(id) {
+    const rules = loadRules();
+    const ruleToEdit = rules.find(rule => rule.id === id);
+
+    if (ruleToEdit) {
+        // フォームにルールのデータを入力
+        ruleIdInput.value = ruleToEdit.id; // IDもセット
+        ruleContentInput.value = ruleToEdit.content;
+        ruleResponsibleMembersInput.value = ruleToEdit.responsibleMembers;
+        ruleRewardInput.value = ruleToEdit.reward;
+
+        ruleFormTitle.textContent = `ルールの編集`; // タイトルを編集用に変更
+        // TODO: 編集モード時のUI調整（削除ボタン表示など）
+        ruleFormArea.classList.add('active'); // フォームを表示
+        editingRuleId = id; // 編集中IDをセット
+    }
+}
+
+// Function to update an existing rule
+function updateRule(id, content, responsibleMembers, reward) {
+    const rules = loadRules();
+    const ruleIndex = rules.findIndex(rule => rule.id === id);
+
+    if (ruleIndex !== -1) {
+        // スタンプ情報は引き継ぐ
+        const existingStamps = rules[ruleIndex].stamps || {};
+        rules[ruleIndex] = {
+            id: id, // IDは変更しない
+            content: content,
+            responsibleMembers: responsibleMembers,
+            reward: reward,
+            stamps: existingStamps // スタンプ情報を引き継ぐ
+        };
+        saveRules(rules);
+        renderRules(rules);
+        alert('ルールを更新しました！');
+        hideRuleForm(); // フォームを閉じる
+    }
+}
+
+// Function to cancel editing mode for rules
+function cancelEditingRule() {
+     ruleForm.reset();
+     ruleIdInput.value = '';
+     ruleFormTitle.textContent = '新しいルールを追加'; // タイトルを元に戻す
+     // TODO: 編集モード時のUI調整を元に戻す
+     ruleFormArea.classList.remove('active'); // フォームを非表示
+     editingRuleId = null; // 編集中IDをリセット
+}
+
+// Function to toggle rule stamp for today
+function toggleRuleStamp(id) {
+    const rules = loadRules();
+    const ruleIndex = rules.findIndex(rule => rule.id === id);
+
+    if (ruleIndex !== -1) {
+        const today = new Date().toISOString().slice(0, 10); // 今日の日付 (YYYY-MM-DD)
+        const currentStamps = rules[ruleIndex].stamps || {}; // 現在のスタンプ情報
+
+        if (currentStamps[today]) {
+            // スタンプ済みなら削除
+            delete currentStamps[today];
+            alert('スタンプを取り消しました。');
+        } else {
+            // スタンプ済みでないなら追加
+            currentStamps[today] = true;
+            alert('スタンプを押しました！');
+        }
+
+        rules[ruleIndex].stamps = currentStamps; // スタンプ情報を更新
+        saveRules(rules); // Local Storageに保存
+        renderRules(rules); // 画面を再描画してスタンプ状態を反映
+    }
+}
+
+
+// Event listener for the add/update rule form submission
+ruleForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // フォームの送信をキャンセル
+
+    const id = ruleIdInput.value ? parseInt(ruleIdInput.value) : null; // IDを取得 (新規の場合はnull)
+    const content = ruleContentInput.value.trim();
+    const responsibleMembers = ruleResponsibleMembersInput.value.trim();
+    const reward = ruleRewardInput.value.trim();
+
+    if (content) { // ルール内容は必須
+        if (id) { // IDがあれば編集
+            updateRule(id, content, responsibleMembers, reward);
+        } else { // IDがなければ新規追加
+            addRule(content, responsibleMembers, reward);
+        }
+    } else {
+        alert('ルール内容は必須です！');
+    }
+});
+
+// Event listener for showing the add rule form
+showAddRuleFormButton.addEventListener('click', showAddRuleForm);
+
+// Event listener for canceling the rule form
+cancelRuleFormButton.addEventListener('click', hideRuleForm);
+
+
+// Load and render schedules when the page is loaded
+window.addEventListener('load', function() {
+    // 初期表示はダッシュボードなので、予定を読み込み・表示
+    const initialSchedules = loadSchedules();
+    renderSchedules(initialSchedules);
+    // TODO: 他のセクションの初期表示処理を追加
+});
+
+
 // --- Dummy Scheduling Logic (for Mockup) ---
 // この部分は前回のモックアップのままですが、必要に応じてscript.jsに移動・整理してください
 document.getElementById('find-available-times').addEventListener('click', function() {
@@ -652,5 +911,6 @@ document.getElementById('find-available-times').addEventListener('click', functi
      }
 
 });
+
 
 

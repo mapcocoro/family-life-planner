@@ -444,6 +444,70 @@
              background-color: #8b5cf6; /* 少し濃い紫 */
          }
 
+        /* Family Rules Section Styles */
+        .rule-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #fce7f3; /* 薄いピンクの線 */
+        }
+
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+
+        .rule-item .rule-content {
+            flex-grow: 1; /* ルール内容を優先的にスペースを占める */
+            font-size: 1.1em;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        .rule-item .rule-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .rule-item .rule-actions button {
+             background: none;
+             border: none;
+             cursor: pointer;
+             color: #a78bfa; /* 薄い紫 */
+             margin-left: 8px;
+             padding: 4px;
+             border-radius: 4px;
+             transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .rule-item .rule-actions button:hover {
+             color: #8b5cf6; /* 少し濃い紫 */
+             background-color: #eee;
+        }
+
+        .rule-item .stamp-button {
+            font-size: 1.5em; /* スタンプアイコンを大きく */
+            color: #f472b6; /* ピンク */
+            margin-right: 10px;
+        }
+
+        .rule-item .stamp-button.stamped {
+            color: #f9a8d4; /* スタンプ済みは薄いピンク */
+        }
+
+         .rule-form-area {
+             /* Initially hidden, will be shown when adding/editing */
+             display: none;
+             margin-top: 20px;
+             padding: 20px;
+             border: 1px solid #fbcfe8;
+             border-radius: 15px;
+             background-color: #fce7f3;
+         }
+
+         .rule-form-area.active {
+             display: block;
+         }
+
 
         /* Settings Section Styles */
         .settings-option {
@@ -484,6 +548,7 @@
             <a href="#" class="nav-link" data-section="scheduling">✨ 予定調整</a>
             <a href="#" class="nav-link" data-section="family">👨‍👩‍👧‍👦 家族</a>
             <a href="#" class="nav-link" data-section="shopping-list">🛒 買い物リスト</a>
+            <a href="#" class="nav-link" data-section="family-rules">📜 家族ルール</a>
             <a href="#" class="nav-link" data-section="settings">⚙️ 設定</a>
         </nav>
 
@@ -820,6 +885,59 @@
                 </div>
             </section>
 
+             <section id="family-rules" class="content-section">
+                 <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">📜 家族ルール</h2>
+
+                    <div class="rule-form-area" id="rule-form-area">
+                         <h3 class="text-xl font-semibold mb-4 text-pink-700" id="rule-form-title">新しいルールを追加</h3>
+                         <form id="rule-form">
+                             <input type="hidden" id="rule-id"> <div class="mb-4">
+                                 <label for="rule-content" class="block text-gray-700 text-sm font-bold mb-2">ルール内容:</label>
+                                 <input type="text" id="rule-content" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 毎日8時に寝る" required>
+                             </div>
+                             <div class="mb-4">
+                                <label for="rule-responsible-members" class="block text-gray-700 text-sm font-bold mb-2">対象メンバー (任意):</label>
+                                <input type="text" id="rule-responsible-members" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 子供A, 子供B">
+                            </div>
+                             <div class="mb-6">
+                                <label for="rule-reward" class="block text-gray-700 text-sm font-bold mb-2">達成時のご褒美 (任意):</label>
+                                <input type="text" id="rule-reward" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 週末に公園に行く">
+                            </div>
+
+                             <div class="flex justify-center space-x-4">
+                                 <button type="button" class="btn-secondary py-2 px-6 text-lg font-semibold" id="cancel-rule-form">キャンセル</button>
+                                 <button type="submit" class="btn-primary py-2 px-6 text-lg font-semibold" id="save-rule-button">保存する</button>
+                             </div>
+                         </form>
+                     </div>
+
+                     <div class="text-center mb-6">
+                        <button class="btn-primary py-2 px-6 text-lg font-semibold" id="show-add-rule-form">新しいルールを追加</button>
+                    </div>
+
+
+                    <div id="rule-list">
+                        <div class="rule-item">
+                            <button class="stamp-button">🌟</button>
+                            <div class="rule-content">毎日8時に寝る</div>
+                            <div class="rule-actions">
+                                <button>編集</button>
+                                <button>削除</button>
+                            </div>
+                        </div>
+                         <div class="rule-item">
+                            <button class="stamp-button stamped">🌟</button>
+                            <div class="rule-content">使ったおもちゃは片付ける</div>
+                             <div class="rule-actions">
+                                <button>編集</button>
+                                <button>削除</button>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+             </section>
+
 
              <section id="settings" class="content-section">
                 <div class="card p-6">
@@ -871,6 +989,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
