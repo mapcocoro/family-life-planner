@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ファミリー・ライフプランナー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 可愛いフォントを読み込む（例：M PLUS Rounded 1c） */
+        @import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=M+PLUS+Rounded+1c:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: #fef3f2; /* 薄いピンク */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+        }
+
+        .header {
+            background-color: #fbcfe8; /* 薄いピンク */
+            color: #831843; /* 濃いピンク */
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #f472b6; /* ピンク */
+            color: white;
+            border-radius: 9999px; /* 丸いボタン */
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #ec4899; /* 少し濃いピンク */
+        }
+
+         .btn-secondary {
+            background-color: #a78bfa; /* 薄い紫 */
+            color: white;
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: background-color 0.3s ease;
+         }
+
+         .btn-secondary:hover {
+             background-color: #8b5cf6; /* 少し濃い紫 */
+         }
+
+         .btn-google {
+             background-color: #4285F4; /* Google Blue */
+             color: white;
+             border-radius: 8px;
+             padding: 10px 20px;
+             display: inline-flex;
+             align-items: center;
+             transition: background-color 0.3s ease;
+         }
+
+         .btn-google:hover {
+             background-color: #357ae8; /* Darker Google Blue */
+         }
+
+         .btn-google img {
+             margin-right: 10px;
+             background-color: white; /* Googleロゴの背景を白に */
+             padding: 5px; /* ロゴ周りに余白 */
+             border-radius: 3px; /* ロゴ背景の角を丸く */
+         }
+
+
+        .input-field {
+            border-radius: 8px;
+            border: 1px solid #fbcfe8; /* 薄いピンクのボーダー */
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+         .select-field {
+            border-radius: 8px;
+            border: 1px solid #fbcfe8; /* 薄いピンクのボーダー */
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+             appearance: none; /* デフォルトの矢印を非表示 */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f472b6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); /* カスタム矢印 */
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+        }
+
+        /* Toggle Switch Style (Basic) */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* Off color */
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #f472b6; /* On color (Pink) */
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 24px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+         .ai-suggestion {
+            background-color: #bfdbfe; /* 薄い水色 */
+            color: #1e3a8a; /* 濃い青 */
+            border-left: 5px solid #60a5fa; /* 水色のライン */
+        }
+
+         .ai-notification {
+             background-color: #d1fae5; /* 薄い緑 */
+             color: #065f46; /* 濃い緑 */
+             border-left: 5px solid #34d399; /* 緑のライン */
+             padding: 15px;
+             border-radius: 8px;
+             margin-bottom: 20px;
+         }
+
+
+        .date-nav button {
+            color: #f472b6; /* ピンク */
+        }
+
+        /* Navigation styles */
+        .nav-bar {
+            background-color: #fbcfe8; /* 薄いピンク */
+        }
+
+        .nav-link {
+            color: #831843; /* 濃いピンク */
+            padding: 10px 15px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: #fce7f3; /* さらに薄いピンク */
+        }
+
+        .nav-link.active {
+            background-color: #f472b6; /* ピンク */
+            color: white;
+        }
+
+        /* Section visibility control */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Calendar Grid Mockup */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .calendar-day-header {
+            font-weight: bold;
+            color: #f472b6; /* ピンク */
+        }
+
+        .calendar-day {
+            background-color: #fce7f3; /* 薄いピンク */
+            padding: 10px 5px;
+            border-radius: 8px;
+            min-height: 60px; /* 高さの目安 */
+            position: relative;
+            font-size: 0.9em;
+            overflow: hidden;
+        }
+
+        .calendar-day.is-today {
+             background-color: #fbcfe8; /* 少し濃いピンク */
+             font-weight: bold;
+        }
+
+        .calendar-day span {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #831843; /* 濃いピンク */
+        }
+
+         .calendar-event {
+            background-color: #f472b6; /* ピンク */
+            color: white;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin-top: 2px;
+            font-size: 0.7em;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+         }
+
+
+        /* Message List Mockup */
+        .message-list .message-item {
+            border-bottom: 1px solid #fbcfe8; /* 薄いピンク */
+            padding: 15px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .message-list .message-item:hover {
+            background-color: #fce7f3; /* 薄いピンク */
+        }
+
+        .message-list .message-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-list .message-sender {
+            font-weight: bold;
+            color: #831843; /* 濃いピンク */
+            margin-bottom: 5px;
+        }
+
+        .message-list .message-snippet {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* Scheduling Section Styles */
+        .scheduling-options {
+            background-color: #ffe4e6; /* 薄い赤ピンク */
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .scheduling-options label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #831843; /* 濃いピンク */
+        }
+
+        .scheduling-results {
+            background-color: #dbeafe; /* 薄い青 */
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #60a5fa; /* 水色のライン */
+        }
+
+        .scheduling-results h3 {
+            color: #1e3a8a; /* 濃い青 */
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .scheduling-results ul {
+            list-style: disc;
+            margin-left: 20px;
+            color: #1e3a8a; /* 濃い青 */
+        }
+
+         .scheduling-results li {
+            margin-bottom: 8px;
+         }
+
+        /* Family Members Section Styles */
+        .member-list .member-item {
+            border-bottom: 1px solid #fbcfe8; /* 薄いピンク */
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .member-list .member-item:last-child {
+            border-bottom: none;
+        }
+
+        .member-list .member-name {
+            font-weight: bold;
+            color: #831843; /* 濃いピンク */
+        }
+
+        /* Settings Section Styles */
+        .settings-option {
+            border-bottom: 1px solid #fbcfe8; /* 薄いピンク */
+            padding: 15px 0;
+        }
+
+         .settings-option:last-child {
+             border-bottom: none;
+         }
+
+        .settings-option a {
+            color: #f472b6; /* ピンク */
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+         .settings-option a:hover {
+             text-decoration: underline;
+         }
+
+
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="container mx-auto">
+
+        <header class="header text-center py-6 mb-8 rounded-lg">
+            <h1 class="text-3xl font-bold mb-2">ファミリー・ライフプランナー</h1>
+            <p class="text-lg">〇〇家へようこそ！</p>
+        </header>
+
+        <nav class="nav-bar p-3 mb-8 rounded-lg flex justify-center space-x-4">
+            <a href="#" class="nav-link active" data-section="dashboard">🏠 ダッシュボード</a>
+            <a href="#" class="nav-link" data-section="calendar">🗓️ カレンダー</a>
+            <a href="#" class="nav-link" data-section="messages">💬 メッセージ</a>
+            <a href="#" class="nav-link" data-section="scheduling">✨ 予定調整</a>
+            <a href="#" class="nav-link" data-section="family">👨‍👩‍👧‍👦 家族</a>
+            <a href="#" class="nav-link" data-section="settings">⚙️ 設定</a>
+        </nav>
+
+        <main>
+            <section id="dashboard" class="content-section active">
+                 <div class="ai-notification mb-8">
+                    <h3 class="text-xl font-semibold mb-3 text-green-800">🔔 AIからのお知らせ</h3>
+                    <p class="text-green-900">「〇〇ちゃん（0歳）の生後2ヶ月が近づいてきました。ヒブ、肺炎球菌、B型肝炎、ロタウイルスの初回接種を検討する時期です。予防接種設定を確認しましょう。💉」</p>
+                     <p class="text-green-900 mt-2">「今週は家族全員の予定が詰まっています。無理のないように休憩を取りましょうね。☕」</p>
+                 </div>
+
+                 <div class="card p-6 mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">🗓️ 今週の予定</h2>
+                    <div class="flex justify-between items-center mb-4 date-nav">
+                        <button class="p-2 rounded-full hover:bg-pink-100">&lt;</button>
+                        <span class="text-xl font-semibold">2024年5月13日 - 5月19日</span>
+                        <button class="p-2 rounded-full hover:bg-pink-100">&gt;</button>
+                    </div>
+                    <div id="schedule-list">
+                        <div class="border-b border-pink-100 py-3 last:border-b-0">
+                            <p class="text-gray-700"><span class="font-semibold text-pink-500">5/15 (水) 10:00</span> - 〇〇さん 病院予約</p>
+                        </div>
+                         <div class="border-b border-pink-100 py-3 last:border-b-0">
+                            <p class="text-gray-700"><span class="font-semibold text-pink-500">5/18 (土) 14:00</span> - 家族で公園へ</p>
+                        </div>
+                         <div class="border-b border-pink-100 py-3 last:border-b-0">
+                            <p class="text-gray-700"><span class="font-semibold text-pink-500">5/19 (日) 終日</span> - △△さん 友達と遊びに行く</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6 mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">✏️ 新しい予定/タスクを追加</h2>
+                    <form id="add-schedule-form">
+                        <div class="mb-4">
+                            <label for="title" class="block text-gray-700 text-sm font-bold mb-2">タイトル:</label>
+                            <input type="text" id="title" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 買い物、習い事、会議" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="date" class="block text-gray-700 text-sm font-bold mb-2">日付:</label>
+                            <input type="date" id="date" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" required>
+                        </div>
+                         <div class="mb-4">
+                            <label for="time" class="block text-gray-700 text-sm font-bold mb-2">時間 (任意):</label>
+                            <input type="time" id="time" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300">
+                        </div>
+                         <div class="mb-4">
+                            <label for="members" class="block text-gray-700 text-sm font-bold mb-2">関連メンバー (任意):</label>
+                            <input type="text" id="members" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 夫, 子供A">
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn-primary py-2 px-6 text-lg font-semibold">追加する</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card p-6 ai-suggestion">
+                    <h2 class="text-2xl font-semibold mb-4 text-blue-800">💡 AIからの提案</h2>
+                    <div id="ai-suggestions-content">
+                        <p class="text-blue-900 mb-3">「今週は週末に家族全員の予定が入っていませんね。天気も良さそうですので、〇〇公園でピクニックはいかがですか？🍱」</p>
+                         <p class="text-blue-900">「明日の〇〇さんの病院予約、忘れずに！帰りに必要なものをリストアップしておきましょうか？📝」</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="calendar" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">🗓️ 全体カレンダー (モック)</h2>
+                     <div class="flex justify-between items-center mb-4 date-nav">
+                        <button class="p-2 rounded-full hover:bg-pink-100">&lt;</button>
+                        <span class="text-xl font-semibold">2024年5月</span>
+                        <button class="p-2 rounded-full hover:bg-pink-100">&gt;</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">日</div>
+                        <div class="calendar-day-header">月</div>
+                        <div class="calendar-day-header">火</div>
+                        <div class="calendar-day-header">水</div>
+                        <div class="calendar-day-header">木</div>
+                        <div class="calendar-day-header">金</div>
+                        <div class="calendar-day-header">土</div>
+
+                        <div class="calendar-day"></div> <div class="calendar-day"></div> <div class="calendar-day"></div> <div class="calendar-day"><span>1</span></div>
+                        <div class="calendar-day"><span>2</span></div>
+                        <div class="calendar-day"><span>3</span></div>
+                        <div class="calendar-day"><span>4</span></div>
+                        <div class="calendar-day"><span>5</span></div>
+                        <div class="calendar-day"><span>6</span></div>
+                        <div class="calendar-day"><span>7</span></div>
+                        <div class="calendar-day"><span>8</span></div>
+                        <div class="calendar-day"><span>9</span></div>
+                        <div class="calendar-day"><span>10</span></div>
+                        <div class="calendar-day"><span>11</span></div>
+                        <div class="calendar-day"><span>12</span></div>
+                        <div class="calendar-day is-today"><span>13</span><div class="calendar-event">病院予約</div></div>
+                        <div class="calendar-day"><span>14</span></div>
+                        <div class="calendar-day"><span>15</span></div>
+                        <div class="calendar-day"><span>16</span></div>
+                        <div class="calendar-day"><span>17</span></div>
+                        <div class="calendar-day"><span>18</span><div class="calendar-event">公園へ</div></div>
+                        <div class="calendar-day"><span>19</span><div class="calendar-event">友達と</div></div>
+                        <div class="calendar-day"><span>20</span></div>
+                        <div class="calendar-day"><span>21</span></div>
+                        <div class="calendar-day"><span>22</span></div>
+                        <div class="calendar-day"><span>23</span></div>
+                        <div class="calendar-day"><span>24</span></div>
+                        <div class="calendar-day"><span>25</span></div>
+                        <div class="calendar-day"><span>26</span></div>
+                        <div class="calendar-day"><span>27</span></div>
+                        <div class="calendar-day"><span>28</span></div>
+                        <div class="calendar-day"><span>29</span></div>
+                        <div class="calendar-day"><span>30</span></div>
+                        <div class="calendar-day"><span>31</span></div>
+                         <div class="calendar-day"></div> <div class="calendar-day"></div> </div>
+                </div>
+            </section>
+
+            <section id="messages" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">💬 メッセージ (モック)</h2>
+                    <div class="message-list">
+                        <div class="message-item">
+                            <div class="message-sender">夫</div>
+                            <div class="message-snippet">明日の夕食、何にする？</div>
+                        </div>
+                        <div class="message-item">
+                            <div class="message-sender">AIアシスタント</div>
+                            <div class="message-snippet">〇〇さんの病院予約まであと2日です。</div>
+                        </div>
+                        <div class="message-item">
+                            <div class="message-sender">子供A</div>
+                            <div class="message-snippet">公園楽しかったね！😊</div>
+                        </div>
+                         <div class="message-item">
+                            <div class="message-sender">家族グループ</div>
+                            <div class="message-snippet">来週の週末の予定について相談があります。</div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                         <input type="text" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="メッセージを入力...">
+                         <button class="btn-primary py-2 px-4 text-sm font-semibold mt-3">送信</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="scheduling" class="content-section">
+                 <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">✨ 予定調整 (モック)</h2>
+
+                    <div class="scheduling-options mb-6">
+                        <h3 class="text-xl font-semibold mb-4 text-pink-700">調整したい条件を入力してください</h3>
+                        <div class="mb-4">
+                            <label for="scheduling-members">調整したいメンバー:</label>
+                            <select id="scheduling-members" class="select-field focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                <option value="">選択してください</option>
+                                <option value="all">家族全員</option>
+                                <option value="member1">夫</option>
+                                <option value="member2">妻</option>
+                                <option value="childA">子供A</option>
+                                <option value="childB">子供B</option>
+                                </select>
+                        </div>
+                         <div class="mb-4">
+                            <label for="scheduling-period">期間:</label>
+                            <select id="scheduling-period" class="select-field focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                <option value="">選択してください</option>
+                                <option value="this-week">今週</option>
+                                <option value="next-week">来週</option>
+                                <option value="this-month">今月</option>
+                                <option value="next-month">来月</option>
+                                 </select>
+                        </div>
+                         <div class="mb-4">
+                            <label for="scheduling-keyword">キーワード (任意):</label>
+                            <input type="text" id="scheduling-keyword" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 食事, 遊び, 病院">
+                        </div>
+                         <div class="text-center">
+                            <button id="find-available-times" class="btn-primary py-2 px-6 text-lg font-semibold">空き時間を見つける</button>
+                        </div>
+                    </div>
+
+                    <div class="scheduling-results">
+                        <h3 class="text-xl font-semibold mb-4 text-blue-800">AIが見つけた候補日</h3>
+                        <div id="scheduling-suggestions-content">
+                            <p class="text-blue-900">「夫さんと妻さんの来週の空き時間を見つけました。以下の候補日はいかがですか？✨」</p>
+                            <ul class="mt-3">
+                                <li>5/20 (月) 19:00 - 21:00</li>
+                                <li>5/22 (水) 10:00 - 12:00</li>
+                                <li>5/25 (土) 終日</li>
+                            </ul>
+                             <p class="text-blue-900 mt-4">「家族全員が来週末に空いている時間はありませんでした。別の週で探してみましょうか？🤔」</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="family" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">👨‍👩‍👧‍👦 家族メンバー (モック)</h2>
+
+                    <div class="member-list mb-6">
+                        <div class="member-item">
+                            <div class="member-name">夫</div>
+                            <button class="btn-secondary">編集</button>
+                        </div>
+                         <div class="member-item">
+                            <div class="member-name">妻</div>
+                            <button class="btn-secondary">編集</button>
+                        </div>
+                         <div class="member-item">
+                            <div class="member-name">〇〇ちゃん (0歳)</div>
+                            <button class="btn-secondary">編集</button>
+                        </div>
+                         <div class="member-item">
+                            <div class="member-name">△△くん (3歳)</div>
+                            <button class="btn-secondary">編集</button>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn-primary py-2 px-6 text-lg font-semibold">新しいメンバーを追加</button>
+                    </div>
+
+                     <div class="mt-8 p-6 border border-pink-100 rounded-lg bg-fce7f3">
+                         <h3 class="text-xl font-semibold mb-4 text-pink-700">メンバー情報入力 (モック)</h3>
+                         <div class="mb-4">
+                             <label for="member-name" class="block text-gray-700 text-sm font-bold mb-2">名前:</label>
+                             <input type="text" id="member-name" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 〇〇ちゃん">
+                         </div>
+                         <div class="mb-4">
+                             <label for="member-birthday" class="block text-gray-700 text-sm font-bold mb-2">誕生日:</label>
+                             <input type="date" id="member-birthday" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300">
+                         </div>
+                         <div class="mb-4">
+                            <label for="member-relation" class="block text-gray-700 text-sm font-bold mb-2">続柄:</label>
+                            <select id="member-relation" class="select-field focus:outline-none focus:ring-2 focus:ring-pink-300">
+                                <option value="">選択してください</option>
+                                <option value="husband">夫</option>
+                                <option value="wife">妻</option>
+                                <option value="child">子供</option>
+                                <option value="grandfather">おじいちゃん</option>
+                                <option value="grandmother">おばあちゃん</option>
+                                <option value="pet">ペット</option>
+                                <option value="other">その他</option>
+                            </select>
+                        </div>
+                         <div class="text-center">
+                             <button class="btn-primary py-2 px-6 text-lg font-semibold">プロフィールを保存</button>
+                         </div>
+                     </div>
+
+                </div>
+            </section>
+
+             <section id="settings" class="content-section">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">⚙️ 設定 (モック)</h2>
+
+                    <div class="settings-option">
+                        <a href="#">家族情報の管理</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">アカウント設定</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">通知設定</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">Googleカレンダー連携</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">LINE連携</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">家計管理アプリ連携 (モック)</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">買い物リスト設定 (モック)</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">家族ルール管理 (モック)</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">災害情報連携設定 (モック)</a>
+                    </div>
+                     <div class="settings-option">
+                        <a href="#">予防接種通知設定 (モック)</a>
+                     </div>
+
+                </div>
+            </section>
+
+
+        </main>
+
+        <footer class="text-center mt-8 text-gray-600 text-sm">
+            <p>&copy; 2024 Family Life Planner. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // JavaScript for basic interaction (optional for mock)
+        document.getElementById('add-schedule-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームの送信をキャンセル
+
+            // フォームからデータを取得
+            const title = document.getElementById('title').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const members = document.getElementById('members').value;
+
+            if (title && date) {
+                // スケジュールリストに新しい項目を追加 (これはダミー表示です)
+                const scheduleList = document.getElementById('schedule-list');
+                const newItem = document.createElement('div');
+                newItem.classList.add('border-b', 'border-pink-100', 'py-3', 'last:border-b-0');
+                newItem.innerHTML = `
+                    <p class="text-gray-700">
+                        <span class="font-semibold text-pink-500">${date} ${time ? time : ''}</span>
+                         - ${title} ${members ? '(' + members + ')' : ''}
+                    </p>
+                `;
+                scheduleList.appendChild(newItem);
+
+                // フォームをリセット
+                this.reset();
+
+                // AI提案エリアに簡単なフィードバックを表示 (これもダミーです)
+                const aiSuggestionsContent = document.getElementById('ai-suggestions-content');
+                const feedback = document.createElement('p');
+                feedback.classList.add('text-blue-900', 'mb-3');
+                feedback.textContent = `「「${title}」を予定に追加しました！素晴らしい計画ですね！✨」`;
+                aiSuggestionsContent.prepend(feedback); // 一番上に追加
+            } else {
+                alert('タイトルと日付は必須です！'); // シンプルなアラート
+            }
+        });
+
+        // --- Section Switching Logic ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+
+                // Remove 'active' class from all links and sections
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                // Add 'active' class to the clicked link
+                this.classList.add('active');
+
+                // Get the target section ID from the data attribute
+                const targetSectionId = this.dataset.section;
+                const targetSection = document.getElementById(targetSectionId);
+
+                // Add 'active' class to the target section
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        // --- Dummy Scheduling Logic (for Mockup) ---
+        document.getElementById('find-available-times').addEventListener('click', function() {
+            const selectedMembers = document.getElementById('scheduling-members').value;
+            const selectedPeriod = document.getElementById('scheduling-period').value;
+            const keyword = document.getElementById('scheduling-keyword').value;
+            const suggestionsDiv = document.getElementById('scheduling-suggestions-content');
+
+            // Clear previous suggestions
+            suggestionsDiv.innerHTML = '';
+
+            if (!selectedMembers || !selectedPeriod) {
+                suggestionsDiv.innerHTML = '<p class="text-red-600">メンバーと期間を選択してください。</p>';
+                return;
+            }
+
+            // --- Dummy AI Suggestion Generation ---
+            // In a real app, you would send these parameters to your backend
+            // which would use OpenAI API and calendar data to find actual slots.
+            let suggestionText = `「${selectedPeriod}に`;
+            if (selectedMembers === 'all') {
+                suggestionText += `家族全員`;
+            } else {
+                // 選択されたメンバー名を適当に表示 (モックなので簡易的に)
+                 const memberSelect = document.getElementById('scheduling-members');
+                 const selectedOptionText = memberSelect.options[memberSelect.selectedIndex].text;
+                 suggestionText += `${selectedOptionText}さん`;
+                 if (selectedMembers !== 'all' && selectedMembers !== '') {
+                     // 複数選択の場合のモック表現
+                     if (Math.random() > 0.5) suggestionText += `と〇〇さん`;
+                 }
+            }
+            suggestionText += `が空いている時間を見つけました。以下の候補日はいかがですか？✨」`;
+
+            let suggestionListHtml = '<ul>';
+            // ダミーの候補日をいくつか生成
+            const today = new Date();
+            for (let i = 0; i < 3; i++) {
+                const candidateDate = new Date(today);
+                candidateDate.setDate(today.getDate() + Math.floor(Math.random() * 14) + 1); // 1～14日後のランダムな日付
+                const month = candidateDate.getMonth() + 1;
+                const day = candidateDate.getDate();
+                const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][candidateDate.getDay()];
+                const randomHour = Math.floor(Math.random() * 10) + 9; // 9時から18時の間の時間
+                const randomMinute = Math.random() > 0.5 ? '00' : '30';
+                const timeSlot = Math.random() > 0.7 ? '終日' : `${randomHour}:${randomMinute} - ${randomHour + 1}:${randomMinute}`;
+
+                suggestionListHtml += `<li>${month}/${day} (${dayOfWeek}) ${timeSlot}</li>`;
+            }
+            suggestionListHtml += '</ul>';
+
+
+            suggestionsDiv.innerHTML = `<p class="text-blue-900 mb-3">${suggestionText}</p>${suggestionListHtml}`;
+
+             // 失敗パターンのモックも追加
+             if (Math.random() < 0.3) { // 30%の確率で失敗パターンを表示
+                 suggestionsDiv.innerHTML += `<p class="text-blue-900 mt-4">「残念ながら、選択された条件に合う空き時間が見つかりませんでした。別の期間やメンバーで探してみましょうか？🤔」</p>`;
+             }
+
+        });
+
+
+    </script>
+
+</body>
+</html>
