@@ -30,6 +30,13 @@ navLinks.forEach(link => {
 
 const scheduleList = document.getElementById('schedule-list');
 const addScheduleForm = document.getElementById('add-schedule-form');
+const titleInput = document.getElementById('title');
+const dateInput = document.getElementById('date');
+const timeInput = document.getElementById('time');
+const membersInput = document.getElementById('members');
+const addScheduleButton = addScheduleForm.querySelector('button[type="submit"]'); // フォームのsubmitボタンを取得
+
+let editingScheduleId = null; // 編集中かどうか、および編集中の予定のIDを保持する変数
 
 // Function to create a schedule item HTML element
 function createScheduleItemElement(schedule) {
@@ -57,7 +64,14 @@ function createScheduleItemElement(schedule) {
         deleteSchedule(scheduleId);
     });
 
-    // TODO: 編集ボタンにイベントリスナーを追加する
+    // 編集ボタンにイベントリスナーを追加
+    newItem.querySelector('.edit-schedule-btn').addEventListener('click', function() {
+        // ボタンの親要素（予定アイテム全体）からスケジュールIDを取得
+        const scheduleId = parseInt(this.closest('.border-b').dataset.scheduleId);
+        // 編集モードを開始
+        startEditingSchedule(scheduleId);
+    });
+
 
     return newItem;
 }
@@ -122,17 +136,79 @@ function deleteSchedule(id) {
 
     // 削除完了のフィードバック (任意)
     alert('予定を削除しました。');
+
+    // 削除した予定が編集中のものだった場合、編集モードを終了
+    if (editingScheduleId === id) {
+        cancelEditing();
+    }
+}
+
+// Function to start editing a schedule
+function startEditingSchedule(id) {
+    const schedules = loadSchedules();
+    // 編集対象の予定をIDで検索
+    const scheduleToEdit = schedules.find(schedule => schedule.id === id);
+
+    if (scheduleToEdit) {
+        // フォームに予定のデータを入力
+        titleInput.value = scheduleToEdit.title;
+        dateInput.value = scheduleToEdit.date;
+        timeInput.value = scheduleToEdit.time;
+        membersInput.value = scheduleToEdit.members;
+
+        // ボタンのテキストを「更新する」に変更
+        addScheduleButton.textContent = '更新する';
+        // 編集中フラグとIDをセット
+        editingScheduleId = id;
+
+        // 必要であれば、編集モードであることを示すUIの変更（例：フォームの背景色を変えるなど）
+        addScheduleForm.classList.add('editing'); // 仮のクラスを追加
+    }
+}
+
+// Function to update an existing schedule
+function updateSchedule(id, title, date, time, members) {
+    const schedules = loadSchedules();
+    // 更新対象の予定をIDで検索し、データを更新
+    const scheduleIndex = schedules.findIndex(schedule => schedule.id === id);
+
+    if (scheduleIndex !== -1) {
+        schedules[scheduleIndex] = {
+            id: id, // IDは変更しない
+            title: title,
+            date: date,
+            time: time,
+            members: members
+        };
+        // Local Storageに保存
+        saveSchedules(schedules);
+        // 画面に再描画
+        renderSchedules(schedules);
+
+        // 更新完了のフィードバック (任意)
+        alert('予定を更新しました。');
+
+        // 編集モードを終了
+        cancelEditing();
+    }
+}
+
+// Function to cancel editing mode
+function cancelEditing() {
+    // フォームをリセット
+    addScheduleForm.reset();
+    // ボタンのテキストを「追加する」に戻す
+    addScheduleButton.textContent = '追加する';
+    // 編集中フラグとIDをリセット
+    editingScheduleId = null;
+    // 編集モードを示すUIの変更を元に戻す
+    addScheduleForm.classList.remove('editing'); // 仮のクラスを削除
 }
 
 
-// Event listener for the add schedule form submission
+// Event listener for the add/update schedule form submission
 addScheduleForm.addEventListener('submit', function(event) {
     event.preventDefault(); // フォームの送信をキャンセル
-
-    const titleInput = document.getElementById('title');
-    const dateInput = document.getElementById('date');
-    const timeInput = document.getElementById('time');
-    const membersInput = document.getElementById('members');
 
     const title = titleInput.value.trim(); // 前後の空白を削除
     const date = dateInput.value;
@@ -140,10 +216,13 @@ addScheduleForm.addEventListener('submit', function(event) {
     const members = membersInput.value.trim(); // 前後の空白を削除
 
     if (title && date) { // タイトルと日付が入力されているかチェック
-        addSchedule(title, date, time, members); // スケジュールを追加
-
-        // フォームをリセット
-        addScheduleForm.reset();
+        if (editingScheduleId !== null) {
+            // 編集中であれば更新処理を実行
+            updateSchedule(editingScheduleId, title, date, time, members);
+        } else {
+            // 編集中でなければ追加処理を実行
+            addSchedule(title, date, time, members);
+        }
 
     } else {
         alert('タイトルと日付は必須です！'); // シンプルなアラート
