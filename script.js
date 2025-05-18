@@ -896,13 +896,16 @@ document.getElementById('find-available-times').addEventListener('click', functi
         const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][candidateDate.getDay()];
         const randomHour = Math.floor(Math.random() * 10) + 9; // 9時から18時の間の時間
         const randomMinute = Math.random() > 0.5 ? '00' : '30';
+        // 修正：テンプレートリテラルを正しく閉じ、変数名を修正
         const timeSlot = Math.random() > 0.7 ? '終日' : `${randomHour}:${randomMinute} - ${randomHour + 1}:${randomMinute}`;
 
+        // 修正：文字列結合とテンプレートリテラルの使用を修正
         suggestionListHtml += `<li>${month}/${day} (${dayOfWeek}) ${timeSlot}</li>`;
     }
     suggestionListHtml += '</ul>';
 
 
+    // 修正：テンプレートリテラルを正しく閉じる
     suggestionsDiv.innerHTML = `<p class="text-blue-900 mb-3">${suggestionText}</p>${suggestionListHtml}`;
 
      // 失敗パターンのモックも追加
@@ -911,6 +914,7 @@ document.getElementById('find-available-times').addEventListener('click', functi
      }
 
 });
+
 
 
 
