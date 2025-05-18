@@ -35,7 +35,7 @@ const addScheduleForm = document.getElementById('add-schedule-form');
 function createScheduleItemElement(schedule) {
     const newItem = document.createElement('div');
     newItem.classList.add('border-b', 'border-pink-100', 'py-3', 'last:border-b-0');
-    // データ属性としてスケジュールIDを保持させる（編集・削除機能で使うため）
+    // データ属性としてスケジュールIDを保持させる
     newItem.dataset.scheduleId = schedule.id;
 
     newItem.innerHTML = `
@@ -44,11 +44,20 @@ function createScheduleItemElement(schedule) {
              - ${schedule.title} ${schedule.members ? '(' + schedule.members + ')' : ''}
         </p>
         <div class="schedule-actions text-right text-sm mt-1">
-             <button class="text-blue-500 hover:underline mr-2">編集</button>
-             <button class="text-red-500 hover:underline">削除</button>
+             <button class="text-blue-500 hover:underline mr-2 edit-schedule-btn">編集</button>
+             <button class="text-red-500 hover:underline delete-schedule-btn">削除</button>
         </div>
     `;
-     // TODO: 編集・削除ボタンにイベントリスナーを追加する
+
+    // 削除ボタンにイベントリスナーを追加
+    newItem.querySelector('.delete-schedule-btn').addEventListener('click', function() {
+        // ボタンの親要素（予定アイテム全体）からスケジュールIDを取得
+        const scheduleId = parseInt(this.closest('.border-b').dataset.scheduleId);
+        // 削除処理を実行
+        deleteSchedule(scheduleId);
+    });
+
+    // TODO: 編集ボタンにイベントリスナーを追加する
 
     return newItem;
 }
@@ -56,6 +65,8 @@ function createScheduleItemElement(schedule) {
 // Function to render schedules from an array
 function renderSchedules(schedules) {
     scheduleList.innerHTML = ''; // Clear current list
+    // 予定を日付順にソート (任意)
+    schedules.sort((a, b) => new Date(a.date) - new Date(b.date));
     schedules.forEach(schedule => {
         const itemElement = createScheduleItemElement(schedule);
         scheduleList.appendChild(itemElement);
@@ -64,16 +75,13 @@ function renderSchedules(schedules) {
 
 // Function to save schedules to Local Storage
 function saveSchedules(schedules) {
-    // JavaScriptのオブジェクトをJSON文字列に変換して保存
     localStorage.setItem('familyLifePlannerSchedules', JSON.stringify(schedules));
 }
 
 // Function to load schedules from Local Storage
 function loadSchedules() {
-    // Local StorageからJSON文字列を取得
     const schedulesJson = localStorage.getItem('familyLifePlannerSchedules');
     if (schedulesJson) {
-        // JSON文字列をJavaScriptのオブジェクトに戻す
         return JSON.parse(schedulesJson);
     }
     return []; // データがない場合は空の配列を返す
@@ -81,9 +89,7 @@ function loadSchedules() {
 
 // Function to add a new schedule
 function addSchedule(title, date, time, members) {
-    // 現在のスケジュールリストを読み込む
     const schedules = loadSchedules();
-    // 新しいスケジュールのオブジェクトを作成（ユニークなIDを付与）
     const newSchedule = {
         id: Date.now(), // 簡単なユニークIDとしてタイムスタンプを使用
         title: title,
@@ -91,11 +97,8 @@ function addSchedule(title, date, time, members) {
         time: time,
         members: members
     };
-    // リストに新しいスケジュールを追加
     schedules.push(newSchedule);
-    // Local Storageに保存
     saveSchedules(schedules);
-    // 画面に再描画
     renderSchedules(schedules);
 
     // AI提案エリアに簡単なフィードバックを表示 (これはモックです)
@@ -106,12 +109,26 @@ function addSchedule(title, date, time, members) {
     aiSuggestionsContent.insertBefore(feedback, aiSuggestionsContent.firstChild);
 }
 
+// Function to delete a schedule
+function deleteSchedule(id) {
+    // 現在のスケジュールリストを読み込む
+    let schedules = loadSchedules();
+    // 削除対象のID以外の予定で新しい配列を作成
+    schedules = schedules.filter(schedule => schedule.id !== id);
+    // Local Storageに保存
+    saveSchedules(schedules);
+    // 画面に再描画
+    renderSchedules(schedules);
+
+    // 削除完了のフィードバック (任意)
+    alert('予定を削除しました。');
+}
+
 
 // Event listener for the add schedule form submission
 addScheduleForm.addEventListener('submit', function(event) {
     event.preventDefault(); // フォームの送信をキャンセル
 
-    // フォームからデータを取得
     const titleInput = document.getElementById('title');
     const dateInput = document.getElementById('date');
     const timeInput = document.getElementById('time');
@@ -200,3 +217,4 @@ document.getElementById('find-available-times').addEventListener('click', functi
      }
 
 });
+
