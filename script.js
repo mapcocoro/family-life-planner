@@ -30,6 +30,12 @@ navLinks.forEach(link => {
                 // フォームエリアを非表示に戻す
                 hideMemberForm();
             }
+            // 買い物リストセクションが表示されたらリストを読み込み・表示
+            else if (targetSectionId === 'shopping-list') {
+                 const initialShoppingList = loadShoppingList();
+                 renderShoppingList(initialShoppingList);
+                 // TODO: AIおすすめアイテムの表示処理を追加
+            }
             // TODO: 他のセクション表示時の初期化処理を追加
         }
     });
@@ -456,6 +462,136 @@ showAddMemberFormButton.addEventListener('click', showAddMemberForm);
 cancelMemberFormButton.addEventListener('click', hideMemberForm);
 
 
+// --- Shopping List Management with Local Storage ---
+
+const shoppingListItemsDiv = document.getElementById('shopping-list-items');
+const newShoppingItemInput = document.getElementById('new-shopping-item-input');
+const addShoppingItemButton = document.getElementById('add-shopping-item-button');
+// TODO: AIおすすめアイテム関連の要素も取得
+
+
+// Function to create a shopping list item HTML element
+function createShoppingListItemElement(item) {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('shopping-list-item');
+    // データ属性としてアイテムIDを保持させる
+    itemDiv.dataset.itemId = item.id;
+    // 購入済みならpurchasedクラスを追加
+    if (item.purchased) {
+        itemDiv.classList.add('purchased');
+    }
+
+    itemDiv.innerHTML = `
+        <input type="checkbox" ${item.purchased ? 'checked' : ''}>
+        <span>${item.name}</span>
+        <div class="actions">
+            <button class="delete-shopping-item-btn">削除</button>
+        </div>
+    `;
+
+    // チェックボックスにイベントリスナーを追加（購入済みの切り替え）
+    itemDiv.querySelector('input[type="checkbox"]').addEventListener('change', function() {
+        const itemId = parseInt(this.closest('.shopping-list-item').dataset.itemId);
+        toggleShoppingItemPurchased(itemId, this.checked);
+    });
+
+    // 削除ボタンにイベントリスナーを追加
+    itemDiv.querySelector('.delete-shopping-item-btn').addEventListener('click', function() {
+        const itemId = parseInt(this.closest('.shopping-list-item').dataset.itemId);
+        deleteShoppingItem(itemId);
+    });
+
+    return itemDiv;
+}
+
+// Function to render shopping list items from an array
+function renderShoppingList(items) {
+    shoppingListItemsDiv.innerHTML = ''; // Clear current list
+    // TODO: ソート順を検討（未購入を上に表示するなど）
+    items.forEach(item => {
+        const itemElement = createShoppingListItemElement(item);
+        shoppingListItemsDiv.appendChild(itemElement);
+    });
+}
+
+// Function to save shopping list to Local Storage
+function saveShoppingList(items) {
+    localStorage.setItem('familyLifePlannerShoppingList', JSON.stringify(items));
+}
+
+// Function to load shopping list from Local Storage
+function loadShoppingList() {
+    const shoppingListJson = localStorage.getItem('familyLifePlannerShoppingList');
+    if (shoppingListJson) {
+        return JSON.parse(shoppingListJson);
+    }
+    return []; // データがない場合は空の配列を返す
+}
+
+// Function to add a new shopping list item
+function addShoppingItem(name) {
+    const shoppingList = loadShoppingList();
+    const newItem = {
+        id: Date.now(), // 簡単なユニークID
+        name: name,
+        purchased: false // 初期状態は未購入
+    };
+    shoppingList.push(newItem);
+    saveShoppingList(shoppingList);
+    renderShoppingList(shoppingList);
+
+    alert(`「${name}」を買い物リストに追加しました！`);
+}
+
+// Function to delete a shopping list item
+function deleteShoppingItem(id) {
+     if (confirm('このアイテムをリストから削除しますか？')) { // 削除確認
+        let shoppingList = loadShoppingList();
+        shoppingList = shoppingList.filter(item => item.id !== id);
+        saveShoppingList(shoppingList);
+        renderShoppingList(shoppingList);
+        alert('アイテムを削除しました。');
+     }
+}
+
+// Function to toggle shopping item purchased status
+function toggleShoppingItemPurchased(id, isPurchased) {
+    const shoppingList = loadShoppingList();
+    const itemIndex = shoppingList.findIndex(item => item.id === id);
+
+    if (itemIndex !== -1) {
+        shoppingList[itemIndex].purchased = isPurchased; // 購入済みステータスを更新
+        saveShoppingList(shoppingList);
+        renderShoppingList(shoppingList); // 画面を再描画して打ち消し線を反映
+        // TODO: 必要であれば購入完了などのフィードバック
+    }
+}
+
+
+// Event listener for the add shopping item button
+addShoppingItemButton.addEventListener('click', function() {
+    const itemName = newShoppingItemInput.value.trim();
+    if (itemName) {
+        addShoppingItem(itemName); // アイテムを追加
+        newShoppingItemInput.value = ''; // 入力フィールドをクリア
+    } else {
+        alert('アイテム名を入力してください。');
+    }
+});
+
+// Allow adding item by pressing Enter key in the input field
+newShoppingItemInput.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent form submission
+        addShoppingItemButton.click(); // Trigger the add button click
+    }
+});
+
+
+// Load and render shopping list when the page is loaded (or section is activated)
+// window.addEventListener('load', function() { ... }); // この処理はセクション切り替えロジックに移しました
+
+
 // --- Dummy Scheduling Logic (for Mockup) ---
 // この部分は前回のモックアップのままですが、必要に応じてscript.jsに移動・整理してください
 document.getElementById('find-available-times').addEventListener('click', function() {
@@ -516,4 +652,5 @@ document.getElementById('find-available-times').addEventListener('click', functi
      }
 
 });
+
 

@@ -349,6 +349,101 @@
              display: block;
          }
 
+        /* Shopping List Section Styles */
+        .shopping-list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #fce7f3; /* 薄いピンクの線 */
+        }
+
+        .shopping-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .shopping-list-item input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.2); /* チェックボックスを少し大きく */
+            accent-color: #f472b6; /* チェック時の色をピンクに */
+            cursor: pointer; /* カーソルをポインターに */
+        }
+
+        .shopping-list-item span {
+            flex-grow: 1; /* アイテム名を優先的にスペースを占める */
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .shopping-list-item.purchased span {
+            text-decoration: line-through; /* 購入済みは打ち消し線 */
+            color: #aaa; /* 色を薄く */
+        }
+
+        .shopping-list-item .actions {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .shopping-list-item .actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #a78bfa; /* 薄い紫 */
+            margin-left: 8px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .shopping-list-item .actions button:hover {
+             color: #8b5cf6; /* 少し濃い紫 */
+             background-color: #eee;
+        }
+
+         .ai-suggestion-list {
+             background-color: #dbeafe; /* 薄い青 */
+             padding: 15px;
+             border-radius: 8px;
+             border-left: 5px solid #60a5fa; /* 水色のライン */
+             margin-top: 20px;
+         }
+
+         .ai-suggestion-list h3 {
+             color: #1e3a8a; /* 濃い青 */
+             font-weight: bold;
+             margin-bottom: 10px;
+         }
+
+         .ai-suggestion-item {
+             padding: 8px 0;
+             border-bottom: 1px dashed #bfdbfe; /* 薄い水色の点線 */
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             color: #1e3a8a; /* 濃い青 */
+             font-size: 0.95em;
+         }
+
+         .ai-suggestion-item:last-child {
+             border-bottom: none;
+         }
+
+         .ai-suggestion-item button {
+             background-color: #a78bfa; /* 薄い紫 */
+             color: white;
+             border: none;
+             border-radius: 4px;
+             padding: 4px 8px;
+             cursor: pointer;
+             font-size: 0.8em;
+             transition: background-color 0.3s ease;
+         }
+
+         .ai-suggestion-item button:hover {
+             background-color: #8b5cf6; /* 少し濃い紫 */
+         }
+
 
         /* Settings Section Styles */
         .settings-option {
@@ -388,6 +483,7 @@
             <a href="#" class="nav-link" data-section="messages">💬 メッセージ</a>
             <a href="#" class="nav-link" data-section="scheduling">✨ 予定調整</a>
             <a href="#" class="nav-link" data-section="family">👨‍👩‍👧‍👦 家族</a>
+            <a href="#" class="nav-link" data-section="shopping-list">🛒 買い物リスト</a>
             <a href="#" class="nav-link" data-section="settings">⚙️ 設定</a>
         </nav>
 
@@ -660,6 +756,71 @@
                 </div>
             </section>
 
+             <section id="shopping-list" class="content-section">
+                 <div class="card p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">🛒 買い物リスト</h2>
+
+                    <div class="flex mb-6">
+                        <input type="text" id="new-shopping-item-input" class="input-field flex-grow mr-3 focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="新しいアイテムを追加...">
+                        <button id="add-shopping-item-button" class="btn-primary py-2 px-6 text-lg font-semibold">追加</button>
+                    </div>
+
+                    <div id="shopping-list-items">
+                        <div class="shopping-list-item">
+                            <input type="checkbox">
+                            <span>牛乳</span>
+                            <div class="actions">
+                                <button>編集</button>
+                                <button>削除</button>
+                            </div>
+                        </div>
+                         <div class="shopping-list-item">
+                            <input type="checkbox">
+                            <span>卵 (10個)</span>
+                             <div class="actions">
+                                <button>編集</button>
+                                <button>削除</button>
+                            </div>
+                        </div>
+                         <div class="shopping-list-item purchased">
+                            <input type="checkbox" checked>
+                            <span>パン</span>
+                             <div class="actions">
+                                <button>編集</button>
+                                <button>削除</button>
+                            </div>
+                        </div>
+                         <div class="shopping-list-item">
+                            <input type="checkbox">
+                            <span>ほうれん草</span>
+                             <div class="actions">
+                                <button>編集</button>
+                                <button>削除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6 ai-suggestion-list mt-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-blue-800">💡 AIのおすすめ (モック)</h2>
+                    <div id="ai-suggested-items">
+                        <div class="ai-suggestion-item">
+                            <span>トマト (献立から)</span>
+                            <button>リストに追加</button>
+                        </div>
+                         <div class="ai-suggestion-item">
+                            <span>鶏肉 (在庫が少ないかも)</span>
+                            <button>リストに追加</button>
+                        </div>
+                         <div class="ai-suggestion-item">
+                            <span>お菓子 (子供が好きなので)</span>
+                            <button>リストに追加</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
              <section id="settings" class="content-section">
                 <div class="card p-6">
                     <h2 class="text-2xl font-semibold mb-4 text-pink-600">⚙️ 設定 (モック)</h2>
@@ -710,5 +871,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
+
 
 
