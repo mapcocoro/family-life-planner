@@ -335,6 +335,21 @@
             color: #831843; /* 濃いピンク */
         }
 
+         .member-form-area {
+             /* Initially hidden, will be shown when adding/editing */
+             display: none;
+             margin-top: 20px;
+             padding: 20px;
+             border: 1px solid #fbcfe8;
+             border-radius: 15px;
+             background-color: #fce7f3;
+         }
+
+         .member-form-area.active {
+             display: block;
+         }
+
+
         /* Settings Section Styles */
         .settings-option {
             border-bottom: 1px solid #fbcfe8; /* 薄いピンク */
@@ -571,9 +586,9 @@
 
              <section id="family" class="content-section">
                 <div class="card p-6">
-                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">👨‍👩‍👧‍👦 家族メンバー (モック)</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-pink-600">👨‍👩‍👧‍👦 家族メンバー</h2>
 
-                    <div class="member-list mb-6">
+                    <div class="member-list mb-6" id="member-list">
                         <div class="member-item">
                             <div class="member-name">夫</div>
                             <button class="btn-secondary">編集</button>
@@ -592,36 +607,54 @@
                         </div>
                     </div>
 
-                    <div class="text-center">
-                        <button class="btn-primary py-2 px-6 text-lg font-semibold">新しいメンバーを追加</button>
+                    <div class="text-center mb-6">
+                        <button class="btn-primary py-2 px-6 text-lg font-semibold" id="show-add-member-form">新しいメンバーを追加</button>
                     </div>
 
-                     <div class="mt-8 p-6 border border-pink-100 rounded-lg bg-fce7f3">
-                         <h3 class="text-xl font-semibold mb-4 text-pink-700">メンバー情報入力 (モック)</h3>
-                         <div class="mb-4">
-                             <label for="member-name" class="block text-gray-700 text-sm font-bold mb-2">名前:</label>
-                             <input type="text" id="member-name" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 〇〇ちゃん">
-                         </div>
-                         <div class="mb-4">
-                             <label for="member-birthday" class="block text-gray-700 text-sm font-bold mb-2">誕生日:</label>
-                             <input type="date" id="member-birthday" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300">
-                         </div>
-                         <div class="mb-4">
-                            <label for="member-relation" class="block text-gray-700 text-sm font-bold mb-2">続柄:</label>
-                            <select id="member-relation" class="select-field focus:outline-none focus:ring-2 focus:ring-pink-300">
-                                <option value="">選択してください</option>
-                                <option value="husband">夫</option>
-                                <option value="wife">妻</option>
-                                <option value="child">子供</option>
-                                <option value="grandfather">おじいちゃん</option>
-                                <option value="grandmother">おばあちゃん</option>
-                                <option value="pet">ペット</option>
-                                <option value="other">その他</option>
-                            </select>
-                        </div>
-                         <div class="text-center">
-                             <button class="btn-primary py-2 px-6 text-lg font-semibold">プロフィールを保存</button>
-                         </div>
+                     <div class="member-form-area" id="member-form-area">
+                         <h3 class="text-xl font-semibold mb-4 text-pink-700" id="member-form-title">メンバー情報入力</h3>
+                         <form id="member-form">
+                             <input type="hidden" id="member-id"> <div class="mb-4">
+                                 <label for="member-name" class="block text-gray-700 text-sm font-bold mb-2">名前:</label>
+                                 <input type="text" id="member-name" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 〇〇ちゃん" required>
+                             </div>
+                             <div class="mb-4">
+                                 <label for="member-birthday" class="block text-gray-700 text-sm font-bold mb-2">誕生日:</label>
+                                 <input type="date" id="member-birthday" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300">
+                             </div>
+                             <div class="mb-4">
+                                <label for="member-relation" class="block text-gray-700 text-sm font-bold mb-2">続柄:</label>
+                                <select id="member-relation" class="select-field focus:outline-none focus:ring-2 focus:ring-pink-300" required>
+                                    <option value="">選択してください</option>
+                                    <option value="husband">夫</option>
+                                    <option value="wife">妻</option>
+                                    <option value="child">子供</option>
+                                    <option value="grandfather">おじいちゃん</option>
+                                    <option value="grandmother">おばあちゃん</option>
+                                    <option value="pet">ペット</option>
+                                    <option value="other">その他</option>
+                                </select>
+                            </div>
+                             <div class="mb-4">
+                                <label for="member-school-work" class="block text-gray-700 text-sm font-bold mb-2">学校・職場など (任意):</label>
+                                <input type="text" id="member-school-work" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: 〇〇小学校">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="member-health" class="block text-gray-700 text-sm font-bold mb-2">健康情報 (アレルギー、持病など - 任意):</label>
+                                <textarea id="member-health" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: そばアレルギー"></textarea>
+                            </div>
+
+                             <div class="mb-6">
+                                <label for="member-hobbies" class="block text-gray-700 text-sm font-bold mb-2">趣味・好きなこと (任意):</label>
+                                <textarea id="member-hobbies" class="input-field focus:outline-none focus:ring-2 focus:ring-pink-300" placeholder="例: サッカー、読書"></textarea>
+                            </div>
+
+                             <div class="flex justify-center space-x-4">
+                                 <button type="button" class="btn-secondary py-2 px-6 text-lg font-semibold" id="cancel-member-form">キャンセル</button>
+                                 <button type="submit" class="btn-primary py-2 px-6 text-lg font-semibold" id="save-member-button">保存する</button>
+                             </div>
+                         </form>
                      </div>
 
                 </div>
@@ -675,7 +708,7 @@
     </div>
 
     <script src="script.js"></script>
-
 </body>
 </html>
+
 

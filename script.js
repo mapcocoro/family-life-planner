@@ -22,6 +22,15 @@ navLinks.forEach(link => {
         // Add 'active' class to the target section
         if (targetSection) {
             targetSection.classList.add('active');
+
+            // 家族セクションが表示されたらメンバーリストを読み込み・表示
+            if (targetSectionId === 'family') {
+                const initialMembers = loadMembers();
+                renderMembers(initialMembers);
+                // フォームエリアを非表示に戻す
+                hideMemberForm();
+            }
+            // TODO: 他のセクション表示時の初期化処理を追加
         }
     });
 });
@@ -231,9 +240,220 @@ addScheduleForm.addEventListener('submit', function(event) {
 
 // Load and render schedules when the page is loaded
 window.addEventListener('load', function() {
+    // 初期表示はダッシュボードなので、予定を読み込み・表示
     const initialSchedules = loadSchedules();
     renderSchedules(initialSchedules);
+    // TODO: 他のセクションの初期表示処理を追加
 });
+
+
+// --- Family Member Management with Local Storage ---
+
+const memberList = document.getElementById('member-list');
+const memberFormArea = document.getElementById('member-form-area');
+const memberFormTitle = document.getElementById('member-form-title');
+const memberForm = document.getElementById('member-form');
+const memberIdInput = document.getElementById('member-id');
+const memberNameInput = document.getElementById('member-name');
+const memberBirthdayInput = document.getElementById('member-birthday');
+const memberRelationInput = document.getElementById('member-relation');
+const memberSchoolWorkInput = document.getElementById('member-school-work');
+const memberHealthInput = document.getElementById('member-health');
+const memberHobbiesInput = document.getElementById('member-hobbies');
+const showAddMemberFormButton = document.getElementById('show-add-member-form');
+const cancelMemberFormButton = document.getElementById('cancel-member-form');
+// const deleteMemberButton = document.getElementById('delete-member-button'); // 削除ボタンは編集モード時に表示する想定
+
+let editingMemberId = null; // 編集中かどうか、および編集中のメンバーのIDを保持する変数
+
+
+// Function to create a member item HTML element
+function createMemberItemElement(member) {
+    const newItem = document.createElement('div');
+    newItem.classList.add('member-item');
+    // データ属性としてメンバーIDを保持させる
+    newItem.dataset.memberId = member.id;
+
+    newItem.innerHTML = `
+        <div class="member-name">${member.name}</div>
+        <div class="member-actions">
+             <button class="btn-secondary edit-member-btn">編集</button>
+             <button class="btn-danger delete-member-btn">削除</button>
+        </div>
+    `;
+
+    // 削除ボタンにイベントリスナーを追加
+    newItem.querySelector('.delete-member-btn').addEventListener('click', function() {
+        const memberId = parseInt(this.closest('.member-item').dataset.memberId);
+        deleteMember(memberId);
+    });
+
+    // 編集ボタンにイベントリスナーを追加
+    newItem.querySelector('.edit-member-btn').addEventListener('click', function() {
+        const memberId = parseInt(this.closest('.member-item').dataset.memberId);
+        startEditingMember(memberId);
+    });
+
+    return newItem;
+}
+
+// Function to render members from an array
+function renderMembers(members) {
+    memberList.innerHTML = ''; // Clear current list
+    members.forEach(member => {
+        const itemElement = createMemberItemElement(member);
+        memberList.appendChild(itemElement);
+    });
+}
+
+// Function to save members to Local Storage
+function saveMembers(members) {
+    localStorage.setItem('familyLifePlannerMembers', JSON.stringify(members));
+}
+
+// Function to load members from Local Storage
+function loadMembers() {
+    const membersJson = localStorage.getItem('familyLifePlannerMembers');
+    if (membersJson) {
+        return JSON.parse(membersJson);
+    }
+    return []; // データがない場合は空の配列を返す
+}
+
+// Function to show the member form for adding
+function showAddMemberForm() {
+    memberFormArea.classList.add('active');
+    memberFormTitle.textContent = '新しいメンバーを追加';
+    memberForm.reset(); // フォームをクリア
+    memberIdInput.value = ''; // 隠しフィールドもクリア
+    editingMemberId = null; // 編集中IDをリセット
+    // TODO: 削除ボタンを非表示にする
+}
+
+// Function to hide the member form
+function hideMemberForm() {
+    memberFormArea.classList.remove('active');
+    cancelEditingMember(); // 編集モードを終了
+}
+
+// Function to add a new member
+function addMember(name, birthday, relation, schoolWork, health, hobbies) {
+    const members = loadMembers();
+    const newMember = {
+        id: Date.now(), // 簡単なユニークIDとしてタイムスタンプを使用
+        name: name,
+        birthday: birthday,
+        relation: relation,
+        schoolWork: schoolWork,
+        health: health,
+        hobbies: hobbies
+    };
+    members.push(newMember);
+    saveMembers(members);
+    renderMembers(members);
+
+    alert('新しいメンバーを追加しました！');
+    hideMemberForm(); // フォームを閉じる
+}
+
+// Function to delete a member
+function deleteMember(id) {
+    if (confirm('このメンバーを削除しますか？')) { // 削除確認
+        let members = loadMembers();
+        members = members.filter(member => member.id !== id);
+        saveMembers(members);
+        renderMembers(members);
+        alert('メンバーを削除しました。');
+        // 削除したメンバーが編集中のものだった場合、編集モードを終了
+        if (editingMemberId === id) {
+            cancelEditingMember();
+        }
+    }
+}
+
+// Function to start editing a member
+function startEditingMember(id) {
+    const members = loadMembers();
+    const memberToEdit = members.find(member => member.id === id);
+
+    if (memberToEdit) {
+        // フォームにメンバーのデータを入力
+        memberIdInput.value = memberToEdit.id; // IDもセット
+        memberNameInput.value = memberToEdit.name;
+        memberBirthdayInput.value = memberToEdit.birthday;
+        memberRelationInput.value = memberToEdit.relation;
+        memberSchoolWorkInput.value = memberToEdit.schoolWork;
+        memberHealthInput.value = memberToEdit.health;
+        memberHobbiesInput.value = memberToEdit.hobbies;
+
+        memberFormTitle.textContent = `${memberToEdit.name}さんの情報を編集`;
+        // TODO: 削除ボタンを表示する
+        memberFormArea.classList.add('active'); // フォームを表示
+        editingMemberId = id; // 編集中IDをセット
+    }
+}
+
+// Function to update an existing member
+function updateMember(id, name, birthday, relation, schoolWork, health, hobbies) {
+    const members = loadMembers();
+    const memberIndex = members.findIndex(member => member.id === id);
+
+    if (memberIndex !== -1) {
+        members[memberIndex] = {
+            id: id, // IDは変更しない
+            name: name,
+            birthday: birthday,
+            relation: relation,
+            schoolWork: schoolWork,
+            health: health,
+            hobbies: hobbies
+        };
+        saveMembers(members);
+        renderMembers(members);
+        alert('メンバー情報を更新しました！');
+        hideMemberForm(); // フォームを閉じる
+    }
+}
+
+// Function to cancel editing mode for members
+function cancelEditingMember() {
+     memberForm.reset();
+     memberIdInput.value = '';
+     memberFormTitle.textContent = 'メンバー情報入力'; // タイトルを元に戻す
+     // TODO: 削除ボタンを非表示にする
+     memberFormArea.classList.remove('active'); // フォームを非表示
+     editingMemberId = null; // 編集中IDをリセット
+}
+
+
+// Event listener for the add member form submission
+memberForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // フォームの送信をキャンセル
+
+    const id = memberIdInput.value ? parseInt(memberIdInput.value) : null; // IDを取得 (新規の場合はnull)
+    const name = memberNameInput.value.trim();
+    const birthday = memberBirthdayInput.value;
+    const relation = memberRelationInput.value;
+    const schoolWork = memberSchoolWorkInput.value.trim();
+    const health = memberHealthInput.value.trim();
+    const hobbies = memberHobbiesInput.value.trim();
+
+    if (name && relation) { // 名前と続柄は必須
+        if (id) { // IDがあれば編集
+            updateMember(id, name, birthday, relation, schoolWork, health, hobbies);
+        } else { // IDがなければ新規追加
+            addMember(name, birthday, relation, schoolWork, health, hobbies);
+        }
+    } else {
+        alert('名前と続柄は必須です！');
+    }
+});
+
+// Event listener for showing the add member form
+showAddMemberFormButton.addEventListener('click', showAddMemberForm);
+
+// Event listener for canceling the member form
+cancelMemberFormButton.addEventListener('click', hideMemberForm);
 
 
 // --- Dummy Scheduling Logic (for Mockup) ---
