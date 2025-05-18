@@ -56,7 +56,7 @@ const titleInput = document.getElementById('title');
 const dateInput = document.getElementById('date');
 const timeInput = document.getElementById('time');
 const membersInput = document.getElementById('members');
-const addScheduleButton = addScheduleForm.querySelector('button[type="submit"]'); // フォームのsubmitボタンを取得
+const addScheduleButton = addScheduleForm.querySelector('button[type="submit']'); // フォームのsubmitボタンを取得
 
 let editingScheduleId = null; // 編集中かどうか、および編集中の予定のIDを保持する変数
 
@@ -911,6 +911,7 @@ document.getElementById('find-available-times').addEventListener('click', functi
      }
 
 });
+
 
 
 
